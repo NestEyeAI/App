@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Nesteye",
+    "slug": "nesteye-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "nesteye",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F5F0E8"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ai.nesteye.mobile"
+    },
+    "android": {
+      "package": "ai.nesteye.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F5F0E8"
+      }
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-notifications",
+      "expo-asset"
+    ]
+  }
+}
