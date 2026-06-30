@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme/ThemeContext';
 import { LoadingState } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { usePreferencesStore } from '@/store/preferencesStore';
@@ -14,19 +14,9 @@ import { AlertDetailScreen } from '@/screens/AlertDetailScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const navTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: colors.background,
-    card: colors.surface,
-    text: colors.textPrimary,
-    border: colors.border,
-    primary: colors.forest,
-  },
-};
-
 export function RootNavigator() {
+  const theme = useTheme();
+  const { colors, isDark } = theme;
   const status = useAuthStore((s) => s.status);
   const restore = useAuthStore((s) => s.restore);
   const hydratePrefs = usePreferencesStore((s) => s.hydrate);
@@ -35,6 +25,18 @@ export function RootNavigator() {
     restore();
     hydratePrefs();
   }, [restore, hydratePrefs]);
+
+  const navTheme = {
+    ...(isDark ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(isDark ? DarkTheme : DefaultTheme).colors,
+      background: colors.background,
+      card: colors.surface,
+      text: colors.textPrimary,
+      border: colors.border,
+      primary: colors.forest,
+    },
+  };
 
   if (status === 'loading') {
     return (

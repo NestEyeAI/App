@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors, spacing, typography } from '@/theme';
+import { spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 import { PrimaryButton, Screen } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { AuthStackParamList } from '@/navigation/types';
@@ -9,6 +10,8 @@ import { AuthStackParamList } from '@/navigation/types';
 type Props = NativeStackScreenProps<AuthStackParamList, 'ForgotPassword'>;
 
 export function ForgotPasswordScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const requestReset = useAuthStore((s) => s.requestPasswordReset);
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
@@ -64,22 +67,23 @@ export function ForgotPasswordScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: { flex: 1, justifyContent: 'center' },
-  heading: { ...typography.h2 },
-  sub: { ...typography.bodySecondary, marginBottom: spacing.xl },
-  field: { marginBottom: spacing.lg },
-  label: { ...typography.label, marginBottom: spacing.sm },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: spacing.lg,
-    height: 52,
-    ...typography.body,
-  },
-  success: { backgroundColor: colors.successBg, borderRadius: 12, padding: spacing.lg },
-  successText: { ...typography.body, color: colors.success },
-  link: { ...typography.label, color: colors.accent, textAlign: 'center', marginTop: spacing.xl },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    wrap: { flex: 1, justifyContent: 'center' },
+    heading: { ...t.typography.h2 },
+    sub: { ...t.typography.bodySecondary, marginBottom: spacing.xl },
+    field: { marginBottom: spacing.lg },
+    label: { ...t.typography.label, marginBottom: spacing.sm },
+    input: {
+      backgroundColor: t.colors.surface,
+      borderWidth: 1,
+      borderColor: t.colors.border,
+      borderRadius: 12,
+      paddingHorizontal: spacing.lg,
+      height: 52,
+      ...t.typography.body,
+    },
+    success: { backgroundColor: t.colors.successBg, borderRadius: 12, padding: spacing.lg },
+    successText: { ...t.typography.body, color: t.colors.success },
+    link: { ...t.typography.label, color: t.colors.accent, textAlign: 'center', marginTop: spacing.xl },
+  });

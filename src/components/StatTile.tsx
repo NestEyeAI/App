@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors, radius, spacing, typography } from '@/theme';
+import { radius, spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 
 interface StatTileProps {
   label: string;
@@ -11,15 +12,16 @@ interface StatTileProps {
   tone?: 'default' | 'success' | 'warning' | 'danger';
 }
 
-const TONE_COLOR: Record<string, string> = {
-  default: colors.forest,
-  success: colors.success,
-  warning: colors.warning,
-  danger: colors.danger,
-};
-
 export function StatTile({ label, value, unit, icon, tone = 'default' }: StatTileProps) {
-  const accent = TONE_COLOR[tone];
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
+  const toneColor: Record<string, string> = {
+    default: colors.forest,
+    success: colors.success,
+    warning: colors.warning,
+    danger: colors.danger,
+  };
+  const accent = toneColor[tone];
   return (
     <View style={styles.tile}>
       {icon && (
@@ -36,26 +38,27 @@ export function StatTile({ label, value, unit, icon, tone = 'default' }: StatTil
   );
 }
 
-const styles = StyleSheet.create({
-  tile: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    minHeight: 96,
-    justifyContent: 'space-between',
-  },
-  iconWrap: {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
-  },
-  value: { ...typography.statMd, fontSize: 22 },
-  unit: { ...typography.caption, fontWeight: '600' },
-  label: { ...typography.caption, marginTop: 2 },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    tile: {
+      flex: 1,
+      backgroundColor: t.colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: t.colors.border,
+      padding: spacing.md,
+      minHeight: 96,
+      justifyContent: 'space-between',
+    },
+    iconWrap: {
+      width: 30,
+      height: 30,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.sm,
+    },
+    value: { ...t.typography.statMd, fontSize: 22 },
+    unit: { ...t.typography.caption, fontWeight: '600' },
+    label: { ...t.typography.caption, marginTop: 2 },
+  });

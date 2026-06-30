@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors, spacing, typography } from '@/theme';
+import { spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 
 interface EmptyStateProps {
   icon?: keyof typeof Feather.glyphMap;
@@ -10,6 +11,8 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ icon = 'inbox', title, message }: EmptyStateProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.wrap}>
       <View style={styles.iconWrap}>
@@ -21,24 +24,25 @@ export function EmptyState({ icon = 'inbox', title, message }: EmptyStateProps) 
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: { alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.xxl * 1.5 },
-  iconWrap: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.surfaceAlt,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-  },
-  title: { ...typography.h3, color: colors.textSecondary },
-  message: {
-    ...typography.bodySecondary,
-    textAlign: 'center',
-    marginTop: spacing.xs,
-    maxWidth: 260,
-  },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    wrap: { alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.xxl * 1.5 },
+    iconWrap: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: t.colors.surfaceAlt,
+      borderWidth: 1,
+      borderColor: t.colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.md,
+    },
+    title: { ...t.typography.h3, color: t.colors.textSecondary },
+    message: {
+      ...t.typography.bodySecondary,
+      textAlign: 'center',
+      marginTop: spacing.xs,
+      maxWidth: 260,
+    },
+  });

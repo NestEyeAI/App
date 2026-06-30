@@ -3,7 +3,8 @@ import { Image, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors, radius, shadow, spacing, typography } from '@/theme';
+import { radius, spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 import {
   Card,
   EmptyState,
@@ -16,7 +17,7 @@ import {
 } from '@/components';
 import { Sparkline } from '@/components/Sparkline';
 import { useActivityReadings, useAlerts, useFarm } from '@/hooks/queries';
-import { gramsToKg, formatRelativeTime, STATUS_LABELS } from '@/hooks/format';
+import { STATUS_LABELS } from '@/hooks/format';
 import { useAuthStore } from '@/store/authStore';
 import { Barn, BarnStatus } from '@/types';
 import { RootStackParamList } from '@/navigation/types';
@@ -31,6 +32,8 @@ const STATUS_TONE: Record<BarnStatus, 'success' | 'warning' | 'danger'> = {
 
 export function HomeScreen() {
   const navigation = useNavigation<Nav>();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const user = useAuthStore((s) => s.user);
   const farm = useFarm();
   const alerts = useAlerts();
@@ -43,7 +46,6 @@ export function HomeScreen() {
     const barns = farm.data.barns;
     const activeAlerts = (alerts.data ?? []).filter((a) => !a.acknowledged).length;
     const birdsMonitored = barns.reduce((sum, b) => sum + b.birdCount, 0);
-    // average of the latest known flock weights (mock proxy: Cobb-aligned)
     const worst: BarnStatus = barns.some((b) => b.status === 'alert')
       ? 'alert'
       : barns.some((b) => b.status === 'watch')
@@ -132,6 +134,8 @@ export function HomeScreen() {
 }
 
 function FlockHealthCard({ status, barnCount }: { status: BarnStatus; barnCount: number }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const tone = STATUS_TONE[status];
   const bg =
     tone === 'success' ? colors.successBg : tone === 'warning' ? colors.warningBg : colors.dangerBg;
@@ -164,6 +168,8 @@ function FlockHealthCard({ status, barnCount }: { status: BarnStatus; barnCount:
 }
 
 function BarnCard({ barn, onPress }: { barn: Barn; onPress: () => void }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const activity = useActivityReadings(barn.id);
   const onlineCams = barn.cameras.filter((c) => c.status === 'online').length;
   const spark = (activity.data ?? []).slice(-24).map((r) => r.activityIndex);
@@ -196,33 +202,34 @@ function BarnCard({ barn, onPress }: { barn: Barn; onPress: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl },
-  header: { paddingTop: spacing.md, marginBottom: spacing.lg, flexDirection: 'row', alignItems: 'center' },
-  greeting: { ...typography.bodySecondary },
-  farmName: { ...typography.h1 },
-  logoMark: { width: 56, height: 64 },
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    scroll: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl },
+    header: { paddingTop: spacing.md, marginBottom: spacing.lg, flexDirection: 'row', alignItems: 'center' },
+    greeting: { ...t.typography.bodySecondary },
+    farmName: { ...t.typography.h1 },
+    logoMark: { width: 56, height: 64 },
 
-  healthCard: { borderRadius: radius.lg, padding: spacing.lg, ...shadow.card },
-  healthRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  healthOverline: { ...typography.overline },
-  healthStatus: { ...typography.statMd, marginVertical: 2 },
-  healthCopy: { ...typography.bodySecondary, maxWidth: 220 },
-  healthIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  healthFoot: { ...typography.caption, marginTop: spacing.md },
+    healthCard: { borderRadius: radius.lg, padding: spacing.lg, ...t.shadow.card },
+    healthRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+    healthOverline: { ...t.typography.overline },
+    healthStatus: { ...t.typography.statMd, marginVertical: 2 },
+    healthCopy: { ...t.typography.bodySecondary, maxWidth: 220 },
+    healthIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+    healthFoot: { ...t.typography.caption, marginTop: spacing.md },
 
-  statRow: { flexDirection: 'row', marginTop: spacing.md },
+    statRow: { flexDirection: 'row', marginTop: spacing.md },
 
-  barnCard: { marginBottom: spacing.md },
-  barnTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  barnTitleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  barnName: { ...typography.h3 },
-  barnMetaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginTop: spacing.md,
-  },
-  barnMeta: { ...typography.body },
-  barnMetaMuted: { ...typography.caption, marginTop: 2 },
-});
+    barnCard: { marginBottom: spacing.md },
+    barnTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    barnTitleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+    barnName: { ...t.typography.h3 },
+    barnMetaRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-end',
+      marginTop: spacing.md,
+    },
+    barnMeta: { ...t.typography.body },
+    barnMetaMuted: { ...t.typography.caption, marginTop: 2 },
+  });

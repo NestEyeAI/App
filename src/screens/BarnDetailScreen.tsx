@@ -2,7 +2,8 @@ import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors, radius, spacing, typography } from '@/theme';
+import { radius, spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 import {
   Card,
   ErrorState,
@@ -30,6 +31,7 @@ const TABS: InnerTab[] = ['Overview', 'Weight', 'Environment', 'Activity'];
 
 export function BarnDetailScreen({ route, navigation }: Props) {
   const { barnId } = route.params;
+  const styles = useThemedStyles(makeStyles);
   const barn = useBarn(barnId);
   const [tab, setTab] = useState<InnerTab>('Overview');
 
@@ -73,7 +75,7 @@ export function BarnDetailScreen({ route, navigation }: Props) {
         </View>
 
         {tab === 'Overview' && <OverviewTab barn={b} />}
-        {tab === 'Weight' && <WeightTab barnId={barnId} flockAge={b.flockAgeDays} catchDay={b.targetCatchDay} />}
+        {tab === 'Weight' && <WeightTab barnId={barnId} catchDay={b.targetCatchDay} />}
         {tab === 'Environment' && <EnvironmentTab barnId={barnId} />}
         {tab === 'Activity' && <ActivityTab barnId={barnId} />}
       </ScrollView>
@@ -82,6 +84,7 @@ export function BarnDetailScreen({ route, navigation }: Props) {
 }
 
 function BarnHeader({ barn }: { barn: Barn }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.header}>
       <View style={styles.headerRow}>
@@ -96,6 +99,8 @@ function BarnHeader({ barn }: { barn: Barn }) {
 }
 
 function CameraGrid({ cameras }: { cameras: Camera[] }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Live Cameras</Text>
@@ -127,6 +132,7 @@ function CameraGrid({ cameras }: { cameras: Camera[] }) {
 }
 
 function OverviewTab({ barn }: { barn: Barn }) {
+  const styles = useThemedStyles(makeStyles);
   const online = barn.cameras.filter((c) => c.status === 'online').length;
   return (
     <View style={styles.section}>
@@ -154,15 +160,8 @@ function OverviewTab({ barn }: { barn: Barn }) {
   );
 }
 
-function WeightTab({
-  barnId,
-  flockAge,
-  catchDay,
-}: {
-  barnId: string;
-  flockAge: number;
-  catchDay: number;
-}) {
+function WeightTab({ barnId, catchDay }: { barnId: string; catchDay: number }) {
+  const styles = useThemedStyles(makeStyles);
   const weight = useWeightReadings(barnId);
 
   const { points, latest } = useMemo(() => {
@@ -213,6 +212,8 @@ function WeightTab({
 }
 
 function EnvironmentTab({ barnId }: { barnId: string }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const env = useEnvReadings(barnId);
   const prefs = usePreferencesStore((s) => s.preferences);
 
@@ -279,6 +280,7 @@ function EnvironmentTab({ barnId }: { barnId: string }) {
 }
 
 function ActivityTab({ barnId }: { barnId: string }) {
+  const styles = useThemedStyles(makeStyles);
   const activity = useActivityReadings(barnId);
 
   const { points, avg } = useMemo(() => {
@@ -309,55 +311,70 @@ function ActivityTab({ barnId }: { barnId: string }) {
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
-  header: { marginBottom: spacing.lg },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  status: { ...typography.h3 },
-  headerMeta: { ...typography.bodySecondary, marginTop: 4 },
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
+    header: { marginBottom: spacing.lg },
+    headerRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+    status: { ...t.typography.h3 },
+    headerMeta: { ...t.typography.bodySecondary, marginTop: 4 },
 
-  section: { marginTop: spacing.sm },
-  sectionTitle: { ...typography.h3, fontSize: 15, marginBottom: spacing.md },
+    section: { marginTop: spacing.sm },
+    sectionTitle: { ...t.typography.h3, fontSize: 15, marginBottom: spacing.md },
 
-  camGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  camTile: { width: '31%' },
-  camFeed: {
-    aspectRatio: 1,
-    borderRadius: radius.md,
-    backgroundColor: colors.forest,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  camTypeTag: {
-    position: 'absolute',
-    top: 4,
-    left: 4,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  camTypeText: { color: colors.textInverse, fontSize: 9, fontWeight: '700' },
-  camOffline: { position: 'absolute', bottom: 6, backgroundColor: colors.danger, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  camOfflineText: { color: colors.textInverse, fontSize: 8, fontWeight: '700' },
-  camLabel: { ...typography.caption, marginTop: 4, textAlign: 'center' },
+    camGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+    camTile: { width: '31%' },
+    camFeed: {
+      aspectRatio: 1,
+      borderRadius: radius.md,
+      backgroundColor: t.colors.forest,
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+    },
+    camTypeTag: {
+      position: 'absolute',
+      top: 4,
+      left: 4,
+      backgroundColor: 'rgba(0,0,0,0.35)',
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 4,
+    },
+    camTypeText: { color: t.colors.textInverse, fontSize: 9, fontWeight: '700' },
+    camOffline: {
+      position: 'absolute',
+      bottom: 6,
+      backgroundColor: t.colors.danger,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 4,
+    },
+    camOfflineText: { color: t.colors.textInverse, fontSize: 8, fontWeight: '700' },
+    camLabel: { ...t.typography.caption, marginTop: 4, textAlign: 'center' },
 
-  tabBar: {
-    flexDirection: 'row',
-    backgroundColor: colors.surfaceAlt,
-    borderRadius: radius.pill,
-    padding: 4,
-    marginTop: spacing.xl,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  tab: { flex: 1, paddingVertical: spacing.sm, alignItems: 'center', borderRadius: radius.pill },
-  tabActive: { backgroundColor: colors.surface, ...{ shadowColor: colors.shadow, shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 1 }, elevation: 1 } },
-  tabText: { ...typography.caption, fontWeight: '600' },
-  tabTextActive: { color: colors.forest, fontWeight: '700' },
+    tabBar: {
+      flexDirection: 'row',
+      backgroundColor: t.colors.surfaceAlt,
+      borderRadius: radius.pill,
+      padding: 4,
+      marginTop: spacing.xl,
+      borderWidth: 1,
+      borderColor: t.colors.border,
+    },
+    tab: { flex: 1, paddingVertical: spacing.sm, alignItems: 'center', borderRadius: radius.pill },
+    tabActive: {
+      backgroundColor: t.colors.surface,
+      shadowColor: t.colors.shadow,
+      shadowOpacity: 0.08,
+      shadowRadius: 6,
+      shadowOffset: { width: 0, height: 1 },
+      elevation: 1,
+    },
+    tabText: { ...t.typography.caption, fontWeight: '600' },
+    tabTextActive: { color: t.colors.forest, fontWeight: '700' },
 
-  statRow: { flexDirection: 'row', marginTop: spacing.md },
-  chartCard: { marginTop: spacing.md },
-  threshold: { ...typography.caption, marginTop: spacing.sm },
-});
+    statRow: { flexDirection: 'row', marginTop: spacing.md },
+    chartCard: { marginTop: spacing.md },
+    threshold: { ...t.typography.caption, marginTop: spacing.sm },
+  });

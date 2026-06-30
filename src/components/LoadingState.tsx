@@ -1,8 +1,11 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { colors, spacing, typography } from '@/theme';
+import { spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 
 export function LoadingState({ message = 'Loading…' }: { message?: string }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.wrap}>
       <ActivityIndicator color={colors.forest} />
@@ -11,7 +14,8 @@ export function LoadingState({ message = 'Loading…' }: { message?: string }) {
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: { alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.xxl * 1.5 },
-  text: { ...typography.bodySecondary, marginTop: spacing.sm },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    wrap: { alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.xxl * 1.5 },
+    text: { ...t.typography.bodySecondary, marginTop: spacing.sm },
+  });

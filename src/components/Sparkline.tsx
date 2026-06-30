@@ -1,12 +1,12 @@
 import React from 'react';
 import { View } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme/ThemeContext';
 
 /** Compact inline trend line for cards. No axes, no labels. */
 export function Sparkline({
   values,
-  color = colors.forest,
+  color,
   width = 96,
   height = 34,
 }: {
@@ -15,6 +15,8 @@ export function Sparkline({
   width?: number;
   height?: number;
 }) {
+  const { colors } = useTheme();
+  const lineColor = color ?? colors.forest;
   if (values.length < 2) return <View style={{ width, height }} />;
   return (
     <View style={{ width, height }} pointerEvents="none">
@@ -23,7 +25,7 @@ export function Sparkline({
         width={width}
         height={height}
         thickness={2}
-        color={color}
+        color={lineColor}
         hideDataPoints
         hideAxesAndRules
         hideYAxisText

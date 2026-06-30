@@ -1,14 +1,8 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme/ThemeContext';
 import { AlertSeverity } from '@/types';
-
-const SEVERITY_COLOR: Record<AlertSeverity, { fg: string; bg: string }> = {
-  danger: { fg: colors.danger, bg: colors.dangerBg },
-  warning: { fg: colors.warning, bg: colors.warningBg },
-  info: { fg: colors.info, bg: colors.infoBg },
-};
 
 interface AlertBadgeProps {
   icon: keyof typeof Feather.glyphMap;
@@ -17,7 +11,13 @@ interface AlertBadgeProps {
 }
 
 export function AlertBadge({ icon, severity, size = 40 }: AlertBadgeProps) {
-  const c = SEVERITY_COLOR[severity];
+  const { colors } = useTheme();
+  const severityColor: Record<AlertSeverity, { fg: string; bg: string }> = {
+    danger: { fg: colors.danger, bg: colors.dangerBg },
+    warning: { fg: colors.warning, bg: colors.warningBg },
+    info: { fg: colors.info, bg: colors.infoBg },
+  };
+  const c = severityColor[severity];
   return (
     <View
       style={[

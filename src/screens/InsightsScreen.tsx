@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors, radius, spacing, typography } from '@/theme';
+import { radius, spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 import {
   Card,
   EmptyState,
@@ -17,6 +18,8 @@ import { useDailySummaries, useFarm, useWeightReadings } from '@/hooks/queries';
 import { formatDate, gramsToKg } from '@/hooks/format';
 
 export function InsightsScreen() {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const farm = useFarm();
   const [barnId, setBarnId] = useState<string | null>(null);
 
@@ -154,34 +157,46 @@ export function InsightsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  headerWrap: { paddingHorizontal: spacing.lg, paddingTop: spacing.md },
-  chips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-    gap: spacing.sm,
-  },
-  chip: { flexShrink: 0, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.pill, borderWidth: 1 },
-  chipIdle: { backgroundColor: colors.surface, borderColor: colors.border },
-  chipActive: { backgroundColor: colors.forest, borderColor: colors.forest },
-  chipText: { ...typography.caption, fontWeight: '600', color: colors.textSecondary, textDecorationLine: 'none' },
-  chipTextActive: { color: colors.textInverse, textDecorationLine: 'none' },
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    headerWrap: { paddingHorizontal: spacing.lg, paddingTop: spacing.md },
+    chips: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.sm,
+      gap: spacing.sm,
+    },
+    chip: {
+      flexShrink: 0,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.pill,
+      borderWidth: 1,
+    },
+    chipIdle: { backgroundColor: t.colors.surface, borderColor: t.colors.border },
+    chipActive: { backgroundColor: t.colors.forest, borderColor: t.colors.forest },
+    chipText: {
+      ...t.typography.caption,
+      fontWeight: '600',
+      color: t.colors.textSecondary,
+      textDecorationLine: 'none',
+    },
+    chipTextActive: { color: t.colors.textInverse, textDecorationLine: 'none' },
 
-  scroll: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl },
-  card: { marginBottom: spacing.md },
-  cardOverline: { ...typography.overline, marginBottom: spacing.md },
-  sectionTitle: { ...typography.h3, fontSize: 15, marginBottom: spacing.md },
-  statRow: { flexDirection: 'row' },
-  feedRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  placeholder: { ...typography.bodySecondary },
-  comingSoon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+    scroll: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl },
+    card: { marginBottom: spacing.md },
+    cardOverline: { ...t.typography.overline, marginBottom: spacing.md },
+    sectionTitle: { ...t.typography.h3, fontSize: 15, marginBottom: spacing.md },
+    statRow: { flexDirection: 'row' },
+    feedRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+    placeholder: { ...t.typography.bodySecondary },
+    comingSoon: {
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      backgroundColor: t.colors.surfaceAlt,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  });

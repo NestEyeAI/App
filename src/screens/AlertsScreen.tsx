@@ -3,7 +3,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors, radius, spacing, typography } from '@/theme';
+import { radius, spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 import {
   AlertBadge,
   Card,
@@ -18,7 +19,6 @@ import { useAlerts, useFarm } from '@/hooks/queries';
 import { ALERT_ICONS, ALERT_LABELS, formatRelativeTime } from '@/hooks/format';
 import { Alert, AlertType } from '@/types';
 import { RootStackParamList } from '@/navigation/types';
-import { Feather as FeatherType } from '@expo/vector-icons';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -36,6 +36,7 @@ const TYPE_FILTERS: { key: TypeFilter; label: string }[] = [
 
 export function AlertsScreen() {
   const navigation = useNavigation<Nav>();
+  const styles = useThemedStyles(makeStyles);
   const alerts = useAlerts();
   const farm = useFarm();
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
@@ -112,11 +113,9 @@ export function AlertsScreen() {
 }
 
 function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+  const styles = useThemedStyles(makeStyles);
   return (
-    <Pressable
-      onPress={onPress}
-      style={[styles.chip, active ? styles.chipActive : styles.chipIdle]}
-    >
+    <Pressable onPress={onPress} style={[styles.chip, active ? styles.chipActive : styles.chipIdle]}>
       <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
     </Pressable>
   );
@@ -131,10 +130,12 @@ function AlertRow({
   barnName: string;
   onPress: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <Card onPress={onPress} style={styles.row}>
       <AlertBadge
-        icon={ALERT_ICONS[alert.type] as keyof typeof FeatherType.glyphMap}
+        icon={ALERT_ICONS[alert.type] as keyof typeof Feather.glyphMap}
         severity={alert.severity}
       />
       <View style={styles.rowBody}>
@@ -162,36 +163,47 @@ function AlertRow({
   );
 }
 
-const styles = StyleSheet.create({
-  headerWrap: { paddingHorizontal: spacing.lg, paddingTop: spacing.md },
-  chips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-    gap: spacing.sm,
-  },
-  chip: {
-    flexShrink: 0,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-  },
-  chipIdle: { backgroundColor: colors.surface, borderColor: colors.border },
-  chipActive: { backgroundColor: colors.forest, borderColor: colors.forest },
-  chipText: { ...typography.caption, fontWeight: '600', color: colors.textSecondary, textDecorationLine: 'none' },
-  chipTextActive: { color: colors.textInverse, textDecorationLine: 'none' },
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    headerWrap: { paddingHorizontal: spacing.lg, paddingTop: spacing.md },
+    chips: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.sm,
+      gap: spacing.sm,
+    },
+    chip: {
+      flexShrink: 0,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.pill,
+      borderWidth: 1,
+    },
+    chipIdle: { backgroundColor: t.colors.surface, borderColor: t.colors.border },
+    chipActive: { backgroundColor: t.colors.forest, borderColor: t.colors.forest },
+    chipText: {
+      ...t.typography.caption,
+      fontWeight: '600',
+      color: t.colors.textSecondary,
+      textDecorationLine: 'none',
+    },
+    chipTextActive: { color: t.colors.textInverse, textDecorationLine: 'none' },
 
-  scroll: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl, paddingTop: spacing.sm },
-  row: { flexDirection: 'row', marginBottom: spacing.md, gap: spacing.md },
-  rowBody: { flex: 1 },
-  rowTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  rowTitle: { ...typography.h3, fontSize: 15 },
-  unreadDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
-  rowMeta: { ...typography.caption, marginTop: 2 },
-  rowMsg: { ...typography.bodySecondary, marginTop: spacing.sm },
-  rowFoot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.md },
-  ackRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  ackText: { ...typography.caption, color: colors.success },
-});
+    scroll: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl, paddingTop: spacing.sm },
+    row: { flexDirection: 'row', marginBottom: spacing.md, gap: spacing.md },
+    rowBody: { flex: 1 },
+    rowTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    rowTitle: { ...t.typography.h3, fontSize: 15 },
+    unreadDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: t.colors.accent },
+    rowMeta: { ...t.typography.caption, marginTop: 2 },
+    rowMsg: { ...t.typography.bodySecondary, marginTop: spacing.sm },
+    rowFoot: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: spacing.md,
+    },
+    ackRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+    ackText: { ...t.typography.caption, color: t.colors.success },
+  });

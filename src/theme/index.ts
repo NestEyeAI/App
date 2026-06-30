@@ -1,5 +1,5 @@
-import { colors } from './colors';
-import { typography } from './typography';
+import { colors, defaultPalette, Palette } from './colors';
+import { makeTypography, typography } from './typography';
 
 export const spacing = {
   xs: 4,
@@ -18,24 +18,33 @@ export const radius = {
   pill: 999,
 } as const;
 
-export const shadow = {
-  card: {
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 2,
-  },
-  floating: {
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 20,
-    elevation: 6,
-  },
-} as const;
+export function makeShadow(p: Palette) {
+  return {
+    card: {
+      shadowColor: p.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 12,
+      elevation: 2,
+    },
+    floating: {
+      shadowColor: p.shadow,
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.12,
+      shadowRadius: 20,
+      elevation: 6,
+    },
+  } as const;
+}
 
-export const theme = { colors, typography, spacing, radius, shadow };
+export type Shadow = ReturnType<typeof makeShadow>;
+
+/** Back-compat static shadow (beige palette). */
+export const shadow = makeShadow(defaultPalette);
 
 export { colors, typography };
-export default theme;
+export type { Palette } from './colors';
+export { palettes, defaultPalette, lightPalette, darkPalette } from './colors';
+export type { ThemeMode } from './colors';
+export { makeTypography };
+export type { Typography } from './typography';

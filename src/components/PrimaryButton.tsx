@@ -7,7 +7,8 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { colors, radius, typography } from '@/theme';
+import { radius } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 
 interface PrimaryButtonProps {
   title: string;
@@ -26,14 +27,23 @@ export function PrimaryButton({
   variant = 'primary',
   style,
 }: PrimaryButtonProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const isDisabled = disabled || loading;
+
+  const variantStyle: Record<string, ViewStyle> = {
+    primary: { backgroundColor: colors.forest },
+    secondary: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.borderStrong },
+    danger: { backgroundColor: colors.danger },
+  };
+
   return (
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
       style={({ pressed }) => [
         styles.base,
-        variantStyles[variant],
+        variantStyle[variant],
         isDisabled && styles.disabled,
         pressed && !isDisabled && styles.pressed,
         style,
@@ -46,29 +56,23 @@ export function PrimaryButton({
           {title}
         </Text>
       )}
-      {/* keep layout height stable */}
       {loading && <View style={{ width: 0 }} />}
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    height: 52,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-  },
-  label: { ...typography.h3, color: colors.textInverse },
-  labelSecondary: { color: colors.forest },
-  disabled: { opacity: 0.5 },
-  pressed: { opacity: 0.88 },
-});
-
-const variantStyles: Record<string, ViewStyle> = {
-  primary: { backgroundColor: colors.forest },
-  secondary: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.borderStrong },
-  danger: { backgroundColor: colors.danger },
-};
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    base: {
+      height: 52,
+      borderRadius: radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+      paddingHorizontal: 20,
+    },
+    label: { ...t.typography.h3, color: t.colors.textInverse },
+    labelSecondary: { color: t.colors.forest },
+    disabled: { opacity: 0.5 },
+    pressed: { opacity: 0.88 },
+  });

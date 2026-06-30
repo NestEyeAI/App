@@ -2,7 +2,8 @@ import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors, radius, spacing, typography } from '@/theme';
+import { radius, spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 import {
   AlertBadge,
   Card,
@@ -20,6 +21,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'AlertDetail'>;
 
 export function AlertDetailScreen({ route, navigation }: Props) {
   const { alertId } = route.params;
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const alerts = useAlerts();
   const farm = useFarm();
   const ack = useAcknowledgeAlert();
@@ -97,9 +100,7 @@ export function AlertDetailScreen({ route, navigation }: Props) {
           <PrimaryButton
             title="View Live Feed"
             variant="secondary"
-            onPress={() =>
-              navigation.navigate('BarnDetail', { barnId: alert.barnId })
-            }
+            onPress={() => navigation.navigate('BarnDetail', { barnId: alert.barnId })}
             style={{ marginTop: spacing.md }}
           />
         </View>
@@ -121,6 +122,8 @@ function DetailRow({
   valueColor?: string;
   last?: boolean;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={[styles.detailRow, !last && styles.detailDivider]}>
       <Feather name={icon} size={16} color={colors.textMuted} />
@@ -130,28 +133,29 @@ function DetailRow({
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
-  snapshot: {
-    height: 200,
-    borderRadius: radius.lg,
-    backgroundColor: colors.surfaceAlt,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.lg,
-  },
-  snapshotText: { ...typography.caption, marginTop: spacing.sm },
-  headRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginBottom: spacing.lg },
-  title: { ...typography.h2, fontSize: 20 },
-  meta: { ...typography.bodySecondary, marginTop: 2 },
-  card: { marginBottom: spacing.md },
-  sectionLabel: { ...typography.overline, marginBottom: spacing.sm },
-  body: { ...typography.body },
-  detailRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
-  detailDivider: { borderBottomWidth: 1, borderBottomColor: colors.border },
-  detailLabel: { ...typography.bodySecondary, flex: 1 },
-  detailValue: { ...typography.body, fontWeight: '600' },
-  actions: { marginTop: spacing.md },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    scroll: { padding: spacing.lg, paddingBottom: spacing.xxl },
+    snapshot: {
+      height: 200,
+      borderRadius: radius.lg,
+      backgroundColor: t.colors.surfaceAlt,
+      borderWidth: 1,
+      borderColor: t.colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.lg,
+    },
+    snapshotText: { ...t.typography.caption, marginTop: spacing.sm },
+    headRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginBottom: spacing.lg },
+    title: { ...t.typography.h2, fontSize: 20 },
+    meta: { ...t.typography.bodySecondary, marginTop: 2 },
+    card: { marginBottom: spacing.md },
+    sectionLabel: { ...t.typography.overline, marginBottom: spacing.sm },
+    body: { ...t.typography.body },
+    detailRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
+    detailDivider: { borderBottomWidth: 1, borderBottomColor: t.colors.border },
+    detailLabel: { ...t.typography.bodySecondary, flex: 1 },
+    detailValue: { ...t.typography.body, fontWeight: '600' },
+    actions: { marginTop: spacing.md },
+  });

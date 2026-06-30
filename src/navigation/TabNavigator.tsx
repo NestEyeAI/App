@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme/ThemeContext';
 import { TabParamList } from './types';
 import { HomeScreen } from '@/screens/HomeScreen';
 import { AlertsScreen } from '@/screens/AlertsScreen';
@@ -18,6 +18,7 @@ const ICONS: Record<keyof TabParamList, keyof typeof Feather.glyphMap> = {
 };
 
 export function TabNavigator() {
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({

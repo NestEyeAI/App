@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, spacing, typography } from '@/theme';
+import { spacing } from '@/theme';
+import { Theme, useThemedStyles } from '@/theme/ThemeContext';
 
 interface SectionHeaderProps {
   title: string;
@@ -10,6 +11,7 @@ interface SectionHeaderProps {
 }
 
 export function SectionHeader({ title, actionLabel, onAction, overline }: SectionHeaderProps) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.row}>
       <View style={{ flex: 1 }}>
@@ -25,13 +27,14 @@ export function SectionHeader({ title, actionLabel, onAction, overline }: Sectio
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    marginBottom: spacing.md,
-  },
-  overline: { ...typography.overline, marginBottom: 2 },
-  title: { ...typography.h2 },
-  action: { ...typography.label, color: colors.accent },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      marginBottom: spacing.md,
+    },
+    overline: { ...t.typography.overline, marginBottom: 2 },
+    title: { ...t.typography.h2 },
+    action: { ...t.typography.label, color: t.colors.accent },
+  });

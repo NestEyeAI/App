@@ -9,7 +9,8 @@ import {
   View,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors, spacing, typography } from '@/theme';
+import { spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 import { PrimaryButton, Screen } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { AuthStackParamList } from '@/navigation/types';
@@ -17,6 +18,8 @@ import { AuthStackParamList } from '@/navigation/types';
 type Props = NativeStackScreenProps<AuthStackParamList, 'SignUp'>;
 
 export function SignUpScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const signUp = useAuthStore((s) => s.signUp);
   const error = useAuthStore((s) => s.error);
   const [name, setName] = useState('');
@@ -97,22 +100,23 @@ export function SignUpScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: { flexGrow: 1, justifyContent: 'center', paddingVertical: spacing.xxl },
-  heading: { ...typography.h2 },
-  sub: { ...typography.bodySecondary, marginBottom: spacing.xl },
-  field: { marginBottom: spacing.lg },
-  label: { ...typography.label, marginBottom: spacing.sm },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: spacing.lg,
-    height: 52,
-    ...typography.body,
-  },
-  error: { ...typography.caption, color: colors.danger, marginBottom: spacing.md },
-  cta: { marginTop: spacing.sm },
-  link: { ...typography.label, color: colors.accent, textAlign: 'center', marginTop: spacing.xl },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    scroll: { flexGrow: 1, justifyContent: 'center', paddingVertical: spacing.xxl },
+    heading: { ...t.typography.h2 },
+    sub: { ...t.typography.bodySecondary, marginBottom: spacing.xl },
+    field: { marginBottom: spacing.lg },
+    label: { ...t.typography.label, marginBottom: spacing.sm },
+    input: {
+      backgroundColor: t.colors.surface,
+      borderWidth: 1,
+      borderColor: t.colors.border,
+      borderRadius: 12,
+      paddingHorizontal: spacing.lg,
+      height: 52,
+      ...t.typography.body,
+    },
+    error: { ...t.typography.caption, color: t.colors.danger, marginBottom: spacing.md },
+    cta: { marginTop: spacing.sm },
+    link: { ...t.typography.label, color: t.colors.accent, textAlign: 'center', marginTop: spacing.xl },
+  });

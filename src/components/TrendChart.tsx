@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
-import { colors, radius, spacing, typography } from '@/theme';
+import { radius, spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 
 export interface TrendPoint {
   value: number;
@@ -12,7 +13,7 @@ interface TrendChartProps {
   data: TrendPoint[];
   color?: string;
   height?: number;
-  /** Optional reference line (e.g. Cobb 500 target). */
+  /** Optional secondary reference line. */
   reference?: TrendPoint[];
   referenceColor?: string;
   suffix?: string;
@@ -25,17 +26,22 @@ interface TrendChartProps {
  */
 export function TrendChart({
   data,
-  color = colors.forest,
+  color,
   height = 160,
   reference,
-  referenceColor = colors.accent,
+  referenceColor,
   suffix = '',
   caption,
 }: TrendChartProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
+  const lineColor = color ?? colors.forest;
+  const refColor = referenceColor ?? colors.accent;
+
   if (!data.length) {
     return (
       <View style={[styles.empty, { height }]}>
-        <Text style={typography.caption}>No data yet</Text>
+        <Text style={styles.emptyText}>No data yet</Text>
       </View>
     );
   }
@@ -52,13 +58,13 @@ export function TrendChart({
         data2={reference?.map((d) => ({ value: d.value }))}
         height={height}
         thickness={2.5}
-        color1={color}
-        color2={referenceColor}
-        dataPointsColor1={color}
+        color1={lineColor}
+        color2={refColor}
+        dataPointsColor1={lineColor}
         hideDataPoints2
         curved
         areaChart
-        startFillColor1={color}
+        startFillColor1={lineColor}
         startOpacity={0.18}
         endOpacity={0.01}
         yAxisOffset={Math.max(0, min - pad)}
@@ -82,13 +88,15 @@ export function TrendChart({
   );
 }
 
-const styles = StyleSheet.create({
-  empty: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surfaceAlt,
-    borderRadius: radius.md,
-  },
-  axisText: { color: colors.textMuted, fontSize: 10 },
-  caption: { ...typography.caption, marginTop: spacing.sm, textAlign: 'center' },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    empty: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: t.colors.surfaceAlt,
+      borderRadius: radius.md,
+    },
+    emptyText: { ...t.typography.caption },
+    axisText: { color: t.colors.textMuted, fontSize: 10 },
+    caption: { ...t.typography.caption, marginTop: spacing.sm, textAlign: 'center' },
+  });

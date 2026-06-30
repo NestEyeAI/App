@@ -1,23 +1,23 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme/ThemeContext';
 import { BarnStatus, CameraStatus } from '@/types';
 
 type DotState = BarnStatus | CameraStatus | 'success' | 'warning' | 'danger';
 
-const COLOR_MAP: Record<DotState, string> = {
-  healthy: colors.success,
-  watch: colors.warning,
-  alert: colors.danger,
-  online: colors.success,
-  offline: colors.danger,
-  success: colors.success,
-  warning: colors.warning,
-  danger: colors.danger,
-};
-
 export function StatusDot({ state, size = 10 }: { state: DotState; size?: number }) {
-  const color = COLOR_MAP[state] ?? colors.textMuted;
+  const { colors } = useTheme();
+  const colorMap: Record<DotState, string> = {
+    healthy: colors.success,
+    watch: colors.warning,
+    alert: colors.danger,
+    online: colors.success,
+    offline: colors.danger,
+    success: colors.success,
+    warning: colors.warning,
+    danger: colors.danger,
+  };
+  const color = colorMap[state] ?? colors.textMuted;
   return (
     <View
       style={[

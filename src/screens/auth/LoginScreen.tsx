@@ -10,7 +10,8 @@ import {
   View,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors, spacing, typography } from '@/theme';
+import { spacing } from '@/theme';
+import { Theme, useTheme, useThemedStyles } from '@/theme/ThemeContext';
 import { PrimaryButton, Screen } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { AuthStackParamList } from '@/navigation/types';
@@ -18,6 +19,8 @@ import { AuthStackParamList } from '@/navigation/types';
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
 export function LoginScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const signIn = useAuthStore((s) => s.signIn);
   const error = useAuthStore((s) => s.error);
   const [email, setEmail] = useState('farmer@willowcreek.ag');
@@ -97,30 +100,31 @@ export function LoginScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: { flexGrow: 1, justifyContent: 'center', paddingVertical: spacing.xxl },
-  brand: { alignItems: 'center', marginBottom: spacing.xxl },
-  logoImg: { width: 200, height: 64 },
-  tagline: { ...typography.caption, marginTop: spacing.xs },
-  heading: { ...typography.h2 },
-  sub: { ...typography.bodySecondary, marginBottom: spacing.xl },
-  field: { marginBottom: spacing.lg },
-  label: { ...typography.label, marginBottom: spacing.sm },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: spacing.lg,
-    height: 52,
-    ...typography.body,
-  },
-  error: { ...typography.caption, color: colors.danger, marginBottom: spacing.md },
-  cta: { marginTop: spacing.sm },
-  links: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: spacing.xl,
-  },
-  link: { ...typography.label, color: colors.accent },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    scroll: { flexGrow: 1, justifyContent: 'center', paddingVertical: spacing.xxl },
+    brand: { alignItems: 'center', marginBottom: spacing.xxl },
+    logoImg: { width: 200, height: 64 },
+    tagline: { ...t.typography.caption, marginTop: spacing.xs },
+    heading: { ...t.typography.h2 },
+    sub: { ...t.typography.bodySecondary, marginBottom: spacing.xl },
+    field: { marginBottom: spacing.lg },
+    label: { ...t.typography.label, marginBottom: spacing.sm },
+    input: {
+      backgroundColor: t.colors.surface,
+      borderWidth: 1,
+      borderColor: t.colors.border,
+      borderRadius: 12,
+      paddingHorizontal: spacing.lg,
+      height: 52,
+      ...t.typography.body,
+    },
+    error: { ...t.typography.caption, color: t.colors.danger, marginBottom: spacing.md },
+    cta: { marginTop: spacing.sm },
+    links: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: spacing.xl,
+    },
+    link: { ...t.typography.label, color: t.colors.accent },
+  });
